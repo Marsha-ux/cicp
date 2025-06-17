@@ -11,6 +11,7 @@ use App\Helpers\ResponseFormatter;
 use App\Services\AuthService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 
 class AuthController extends Controller
@@ -18,7 +19,7 @@ class AuthController extends Controller
 
     public function __construct(public AuthService $authService)
     {
-        
+
     }
 
     public function login(LoginRequest $request){
@@ -36,25 +37,34 @@ class AuthController extends Controller
     public function Register(RegisterRequest $request)
     {
         $data = $request->validated();
-        [$customer, $token] = DB::transaction(function () use ($data) {
+        try {
+
+            DB::beginTransaction();
+
+
             $customer = Customer::create([
                 'name' => $data['name'],
                 'email' => $data['email'],
-                'phone' => $data['phone'],
-                'address' => $data['address'],
+                'phone' => $data['phone']??null,
+                'address' => $data['address']??null,
             ]);
-            $customer->user()->create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password'=>$data['password'],
-            ]);
-            $token = $customer->user->createToken('authToken')->plainTextToken;
-            return [$customer, $token];
-        });
-        return ResponseFormatter::success('Register success',[
-            'token' => $token,
-            'token_type' => 'Bearer',
-            'user'=>$customer->user,
-        ]);
+            $result = $this->authService->register($data['name'], $data['email'], $data['password'], $customer);
+            DB::commit();
+
+            if (!$result) {
+                return ResponseFormatter::error(['error' => 'Something went wrong'], 500);
             }
-}
+            return ResponseFormatter::success('Customer created successfully', [
+                'token' => $result['token'],
+                'token_type' => $result['token_type'],
+                'user' => $result['user'],
+
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            dd($e->getMessage());
+            Log::error('Merchant registration failed: ' . $e->getMessage());
+            return ResponseFormatter::error(['error' => 'Something went wrong'], 500);
+        }
+
+    }}

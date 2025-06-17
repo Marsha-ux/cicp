@@ -5,32 +5,35 @@ namespace App\Http\Controllers\api\admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\LoginRequest;
 use App\Models\Admin;
+use App\Models\Customer;
 use App\Models\User;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\ResponseFormatter;
 
 class AuthController extends Controller
 {
-    public function login(LoginRequest $request){
-        $credentials = $request->only('email', 'password');
-        if(Auth::attempt($credentials)){
-            /** @var User $user */
-            $user=Auth::user();
-            if($user->user_type != (new Admin)->getMorphClass()){
-                return ResponseFormatter::error('Unauthorized', 401);
-            }
-            $token = $user->createToken('authToken')->plainTextToken;
+    public function __construct(public AuthService $authService)
+    {
 
-            return ResponseFormatter::success('Login successful', [
+    }
+    public function login(LoginRequest $request){
+
+        $credentials = $request->only('email', 'password');
+        [$success, $token, $token_type, $user] = $this->authService->login($credentials['email'], $credentials['password'], (new Admin())->getMorphClass());
+        if($success){
+            return ResponseFormatter::success('login success', [
                 'token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $user
+                'token_type' => $token_type,
+                'user' => $user,
             ]);
         }
-
-        return ResponseFormatter::error('Invalid credentials', 401);
+        return ResponseFormatter::error('unauthorized',401);
     }
+
+
+
 
 
 }

@@ -20,4 +20,20 @@ class AuthService
             return [true, $token,'Bearer',$user];
         }
     }
+    public function register($name,$email, $password,$userable){
+   $user= $userable->user()->create([
+        'email' => $email,
+        'password' => $password,
+        'name' => $name
+    ]);
+
+    $token=$user->createToken('authToken')->plainTextToken;
+        return [
+            'success' => true,
+            'token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ];
+
+    }
 }
