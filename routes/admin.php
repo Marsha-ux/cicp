@@ -3,8 +3,15 @@
 use App\Http\Controllers\api\admin\ProductController;
 use App\Http\Controllers\api\admin\CategoryController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\api\admin\CustomerController;
 
-Route::prefix('admin')->middleware('user-type:admin')->group(function () {
+
+
+Route::prefix('auth')->controller(\App\Http\Controllers\api\admin\AuthController::class)->group(function () {
+
+    Route::post('/login', 'login');
+});
+//Route::middleware('user-type:admin')->group(function () {
     Route::prefix('category')->controller(CategoryController::class)->group(function () {
         Route::post('/add', 'store');
         Route::get('/', 'index');
@@ -12,9 +19,7 @@ Route::prefix('admin')->middleware('user-type:admin')->group(function () {
         Route::put('/update/{Category}', 'update');
         Route::delete('/delete/{Category}', 'destroy');
     });
-    Route::prefix('auth')->controller(\App\Http\Controllers\api\admin\AuthController::class)->group(function () {
-        Route::post('/login', 'login');
-    });
+
     Route::prefix('product')->controller(ProductController::class)->group(function () {
         Route::post('/add', 'store');
         Route::get('/', 'index');
@@ -36,5 +41,5 @@ Route::prefix('admin')->middleware('user-type:admin')->group(function () {
         // Route::get('/get-contact/{Customer}', 'getContact');
         // Route::get('/get-contacts/{Customer}', 'getContacts');
     });
-});
+//});
 
