@@ -33,4 +33,26 @@ class MerchantController extends Controller
         $contact = $merchant->getContact($id);
         return ResponseFormatter::success('Contact retrieved successfully', $contact);
     }
+    public function addAddress(Request $request, Merchant $merchant){
+        $merchant->createAddress($request->name,$request->country,$request->city,$request->street,$request->house_number);
+        return ResponseFormatter::success('Address added successfully', $merchant);
+    }
+    public function updateAddress(Request $request, Merchant $merchant, $id){
+        $merchant->updateAddress($id,$request->name,$request->country,$request->city,$request->street,$request->house_number);
+        return ResponseFormatter::success('Address updated successfully', $merchant);
+    }
+    public function deleteAddress(Merchant $merchant, $id){
+        $merchant->deleteAddress($id);
+        return ResponseFormatter::success('Address deleted successfully', $merchant);
+    }
+    public function getAddress(Merchant $merchant, $id){
+        $address = $merchant->getAddress($id);
+        return ResponseFormatter::success('Address retrieved successfully', $address);
+    }
+    public function getAddresses(Merchant $merchant){
+        $addresses = $merchant->getAddresses();
+        return ResponseFormatter::success('Addresses retrieved successfully', $addresses);
+    }
+
+
 }
