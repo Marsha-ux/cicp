@@ -17,7 +17,9 @@ Route::prefix('customer')->group(function () {
 Route::get('/test-api', function () {
     return response()->json(['message' => 'API Route Works!']);
 });
+
 Route::middleware('auth:sanctum')->group(function () {
-Route::post('/upload-file', [FileController::class, 'uploadFile']);
+    Route::post('upload-file', [FileController::class, 'uploadFile']);
+    Route::post('download-file', [FileController::class, 'downloadFile']);
 });
 
