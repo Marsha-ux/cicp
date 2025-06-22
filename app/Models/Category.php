@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use App\Http\Traits\HasImages;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Category extends Model
-{    
+{     use HasImages;
     protected static function booted()
     {
         static::creating(function($category){

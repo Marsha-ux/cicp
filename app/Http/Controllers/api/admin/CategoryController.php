@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\api\admin;
 
+use App\Enums\ImagePositionEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CategoryResource;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Helpers\ResponseFormatter;
 use App\Http\Requests\Admin\StoreCategoryRequest;
@@ -16,8 +19,8 @@ class CategoryController extends Controller
     public function index()
     {
         try {
-            $categories = Category::all();
-            return ResponseFormatter::success('Categories fetched successfully', $categories);
+            $categories = Category::with(['mainImage'])->get();
+            return ResponseFormatter::success('Categories fetched successfully', CategoryResource::collection($categories));
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
             return ResponseFormatter::error('Failed to get categories');
@@ -35,16 +38,28 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request)
     {
         try {
+            DB::beginTransaction();
+            /** @var Category */
             $category = Category::create([
                 'name' => $request->name,
                 'description'=> $request->description,
                 'slug' => Str::slug($request->name)
             ]);
-            return ResponseFormatter::success('Category created successfully', $category);
+
+            foreach($request->images as $image)
+            {
+                $category->addImage($image['path'], ImagePositionEnum::from($image['position']), 'public', $image['is_main']);
+            }
+
+            DB::commit();
         } catch (\Exception $exception) {
+            DB::rollBack();
             Log::error($exception->getMessage());
             return ResponseFormatter::error('Failed to create category');
         }
+
+        return ResponseFormatter::success('Category created successfully', $category);
+
     }
     public function update(UpdateCategoryRequest $request, Category $category)
     {

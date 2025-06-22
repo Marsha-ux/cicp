@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Rules\CheckIsMainRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCategoryRequest extends FormRequest
@@ -24,6 +25,10 @@ class StoreCategoryRequest extends FormRequest
         return [
             'name' => 'required|string|unique:categories,name',
             'description' => 'nullable|string',
+            'images' => ['array', new CheckIsMainRule()],
+            'images.*.path' => 'string',
+            'images.*.position' => ['string', Rule::enum(ImagePositionEnum::class)],
+            'images.*.is_main' => ['boolean'],
         ];
 
     }

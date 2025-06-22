@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Admin;
+use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Merchant;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +31,8 @@ Relation::enforceMorphMap([
     'customer'=> Customer::class,
     'merchant'=> Merchant::class,
     'user'=>User::class,
+    'category'=> Category::class,
+    'product'=> Product::class,
 ]);
     }
 }
