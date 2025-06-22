@@ -21,7 +21,7 @@ class CategoryResource extends JsonResource
            'description' => $this->description,
            'image' => ImageResource::make($this->mainImage),
            'sub_categories' => CategoryResource::collection($this->subCategories),
-           'products_count' => 182,
+           'products_count' => $this->products_count,
        ];
 
     }
