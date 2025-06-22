@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
-use App\Http\Traits\HasImages;
+use App\Traits\HasImages;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Category extends Model
-{     use HasImages;
+{
+    use HasImages, HasFactory;
+    
     protected static function booted()
     {
         static::creating(function($category){
@@ -23,6 +26,10 @@ class Category extends Model
     }
     public function products(){
         return $this->hasMany(Product::class);
+    }
+
+    public function subCategories(){
+        return $this->hasMany(Category::class, 'parent_category_id')->with('subCategories');
     }
 }
 

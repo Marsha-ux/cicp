@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
+use App\Models\Product;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -19,8 +21,15 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);*/
-        $this->call([
-            SeedBasedData::class,
-        ]);
+        // $this->call([
+            
+        // ]);
+
+
+        // Category::factory(4)->has(Category::factory(5)->has(Category::factory(5), 'subCategories'), 'subCategories')->create();
+
+
+        Product::factory(1000)->create();
+
     }
 }

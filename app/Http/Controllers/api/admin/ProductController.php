@@ -11,14 +11,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Admin\Product\StoreProductRequest;
 use App\Http\Requests\Admin\Product\UpdateProductRequest;
-
+use App\Http\Resources\ProductResource;
 
 class ProductController extends Controller
 {
     public function index(){
         try{
         $products = Product::all();
-        return ResponseFormatter::success($products);}
+        return ResponseFormatter::success(
+            ProductResource::collection($products)
+        );}
         catch (\Exception $exception){
             log::error($exception->getMessage());
             return ResponseFormatter::error("an error occurred");
@@ -26,7 +28,7 @@ class ProductController extends Controller
     }
 
     public function show(Product $product){
-        return ResponseFormatter::success($product);
+        return ResponseFormatter::success(ProductResource::make($product));
     }
     public function store(StoreProductRequest $request){
         try{
@@ -42,7 +44,7 @@ class ProductController extends Controller
         $product->addimage($image['path'],ImagePositionEnum::from($image['position']),'public',0);
         }
         DB::commit();
-        return ResponseFormatter::success("Product created successfully",$product);}
+        return ResponseFormatter::success("Product created successfully", ProductResource::make($product));}
         catch (\Exception $exception){
             DB::rollBack();
             Log::error($exception->getMessage());
@@ -54,7 +56,7 @@ class ProductController extends Controller
         try{
             $data = $request->validated();
             $product->update($data);
-            return ResponseFormatter::success($product);
+            return ResponseFormatter::success(ProductResource::make($product));
         }
         catch (\Exception $exception){
             Log::error($exception->getMessage());

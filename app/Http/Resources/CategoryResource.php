@@ -18,8 +18,10 @@ class CategoryResource extends JsonResource
        return [
            'id' => $this->id,
            'name' => $this->name,
-           'image' => isset($this->mainImage) ? Storage::disk($this->mainImage?->disk)->url($this->mainImage?->path) : null,
-           'products_count' => 182,
+           'description' => $this->description,
+           'image' => ImageResource::make($this->mainImage),
+           'sub_categories' => CategoryResource::collection($this->subCategories),
+           'products_count' => $this->products_count,
        ];
 
     }
