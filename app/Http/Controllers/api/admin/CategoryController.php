@@ -19,7 +19,19 @@ class CategoryController extends Controller
     public function index()
     {
         try {
-            $categories = Category::with(['mainImage'])->get();
+            $categories = Category::with(['mainImage'])->withCount('products')->get();
+            
+            return ResponseFormatter::success('Categories fetched successfully', CategoryResource::collection($categories));
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+            return ResponseFormatter::error('Failed to get categories');
+        }
+    }
+    public function index_tree()
+    {
+        try {
+            $categories = Category::with(['mainImage', 'subCategories'])->whereNUll('parent_category_id')->get();
+
             return ResponseFormatter::success('Categories fetched successfully', CategoryResource::collection($categories));
         } catch (\Exception $exception) {
             Log::error($exception->getMessage());
@@ -54,11 +66,11 @@ class CategoryController extends Controller
             DB::commit();
         } catch (\Exception $exception) {
             DB::rollBack();
-            Log::error($exception->getMessage());
+            Log::error($exception->getMessage(), $exception->getTrace());
             return ResponseFormatter::error('Failed to create category');
         }
 
-        return ResponseFormatter::success('Category created successfully', $category);
+        return ResponseFormatter::success('Category created successfully', CategoryResource::make($category));
 
     }
     public function update(UpdateCategoryRequest $request, Category $category)

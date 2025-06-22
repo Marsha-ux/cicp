@@ -13,6 +13,7 @@ Route::prefix('auth')->controller(\App\Http\Controllers\api\admin\AuthController
 });
 //Route::middleware('user-type:admin')->group(function () {
 Route::middleware(['auth:sanctum', 'user-type:admin'])->group(function () {
+        Route::get('category_tree', [CategoryController::class, 'index_tree']);
         Route::apiResource('category', CategoryController::class);
         Route::apiResource('product', ProductController::class);
         Route::apiResource('customer', CustomerController::class);

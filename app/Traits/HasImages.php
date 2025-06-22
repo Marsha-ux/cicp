@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Traits;
+namespace App\Traits;
 use App\Enums\ImagePositionEnum;
 use App\Models\Image;
 
@@ -8,7 +8,7 @@ trait HasImages{
        return $this->morphMany(Image::class, 'imageable');
     }
     public function mainImage(){
-        return $this->morphOne(Image::class, 'imageable');
+        return $this->morphOne(Image::class, 'imageable')->where('is_main', '=', 1);
     }
     public function addImage(string $path,ImagePositionEnum $position,$disk, $is_main){
      return   $this->images()->create([
