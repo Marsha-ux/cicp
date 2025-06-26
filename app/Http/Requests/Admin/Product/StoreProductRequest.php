@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Admin\Product;
 
+use App\Enums\ImagePositionEnum;
+use App\Rules\CheckIsMainRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -34,7 +36,10 @@ class StoreProductRequest extends FormRequest
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric',
-            //
+            'images' => ['nullable', 'array', new CheckIsMainRule()],
+            'images.*.path' => 'string',
+            'images.*.position' => ['string', Rule::enum(ImagePositionEnum::class)],
+            'images.*.is_main' => ['boolean'],
         ];
     }
 }
