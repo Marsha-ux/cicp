@@ -13,10 +13,6 @@ class Product extends Model
     
     protected $fillable = ['name', 'price','description', 'category_id'];
 
-    public static function booted(){
-        static::observe(ProductObserver::class);
-    }
-
     public function category(){
         return $this->belongsTo(Category::class);
     }

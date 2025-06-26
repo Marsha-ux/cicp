@@ -23,13 +23,11 @@ class RefreshCategoryPathJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $category = $this->category;
-
-        while($category != null){
-
+        $category=$this->category;
+        while($category){
             $category->increment('products_count', $this->count);
-
-            $category = $category->parentCategory;
+            $category=$category->parent_category()->first();
         }
+
     }
 }

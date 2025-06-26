@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 class Category extends Model
 {
     use HasImages, HasFactory;
-    
+
     protected static function booted()
     {
         static::creating(function($category){
@@ -20,7 +20,7 @@ class Category extends Model
             $category->slug = Str::slug($category->name);
         });
     }
-    protected $fillable = ['name','merchant_id','description'];
+    protected $fillable = ['name','merchant_id','description','products_count','parent_category_id'];
     public function merchant(){
         return $this->belongsTo(Merchant::class);
     }
@@ -34,6 +34,10 @@ class Category extends Model
     
     public function subCategories(){
         return $this->hasMany(Category::class, 'parent_category_id')->with('subCategories');
+    }
+    public function parent_category()
+    {
+        return $this->belongsTo(Category::class, 'parent_category_id');
     }
 }
 
