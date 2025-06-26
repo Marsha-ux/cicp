@@ -14,7 +14,7 @@ class ProductObserver
     {
         $category=$product->category()->first();
         while($category){
-            $category->increment('product_count');
+            $category->increment('products_count');
             $category=$category->parent_category()->first();
         }
 
@@ -37,7 +37,7 @@ class ProductObserver
     {
         $category=$product->category()->first();
         while($category){
-            $category->decrement('product_count');
+            $category->decrement('products_count');
             $category=$category->parent_category()->first();
         }
     }
