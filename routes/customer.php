@@ -15,8 +15,12 @@ Route::middleware(['auth:sanctum', 'user-type:customer'])->group(function () {
     // broswe products in home page
 
     Route::get('home_page_data', HomePageController::class);
+    Route::apiResource('cart_item', \App\Http\Controllers\api\Customer\CartItemController::class);
 
     // search products
+
+
+
 
     // add to wishlist
 
@@ -28,4 +32,3 @@ Route::middleware(['auth:sanctum', 'user-type:customer'])->group(function () {
 
 
 });
- 
