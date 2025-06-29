@@ -1,5 +1,7 @@
 <?php
 use App\Http\Controllers\api\Customer\AuthController;
+use App\Http\Controllers\api\Customer\CartController;
+use App\Http\Controllers\api\Customer\CartItemController;
 use App\Http\Controllers\api\Customer\HomePageController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,7 +17,8 @@ Route::middleware(['auth:sanctum', 'user-type:customer'])->group(function () {
     // broswe products in home page
 
     Route::get('home_page_data', HomePageController::class);
-    Route::apiResource('cart_item', \App\Http\Controllers\api\Customer\CartItemController::class);
+    Route::get('cart', [CartController::class, 'myCart']);
+    Route::apiResource('cart_item', CartItemController::class);
 
     // search products
 

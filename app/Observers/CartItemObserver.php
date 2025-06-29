@@ -17,7 +17,7 @@ class CartItemObserver
     /**
      * Handle the CartItem "updated" event.
      */
-    public function updated(CartItem $cartItem): void
+    public function updating(CartItem $cartItem): void
     {
         if ($cartItem->isDirty('quantity')) {
 

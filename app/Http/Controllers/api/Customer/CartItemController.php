@@ -9,6 +9,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CartItemController extends Controller
@@ -19,6 +20,7 @@ class CartItemController extends Controller
 
             $data = $request->validated();
 
+            DB::beginTransaction();
 
             $cart = Cart::firstOrCreate(
                 ['customer_id' => auth()->user()->user_id, 'status' => 'open']
@@ -34,9 +36,9 @@ class CartItemController extends Controller
 
 
             ]);
+            DB::commit();
         } catch (\Exception $exception) {
-            dd($exception->getMessage());
-
+            DB::rollBack();
             Log::error($exception->getMessage());
             return ResponseFormatter::error("an error occurred");
         }
@@ -46,9 +48,15 @@ class CartItemController extends Controller
     public function destroy(CartItem $CartItem)
     {
         try {
+            $this->authorize('delete', $CartItem);
+            
             $CartItem->delete();
 
-        } catch (\Exception $exception) {
+        }
+        catch (\Illuminate\Auth\Access\AuthorizationException $exception) {
+            return ResponseFormatter::error("you are not authorized to delete this item", 403);
+        }
+         catch (\Exception $exception) {
             Log::error($exception->getMessage());
             return ResponseFormatter::error("an error occurred");
         }
