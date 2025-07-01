@@ -45,12 +45,12 @@ class CartItemController extends Controller
 
     }
 
-    public function destroy(CartItem $CartItem)
+    public function destroy(CartItem $cartItem)
     {
         try {
-            $this->authorize('delete', $CartItem);
+            $this->authorize('delete', $cartItem);
             
-            $CartItem->delete();
+            $cartItem->delete();
 
         }
         catch (\Illuminate\Auth\Access\AuthorizationException $exception) {
