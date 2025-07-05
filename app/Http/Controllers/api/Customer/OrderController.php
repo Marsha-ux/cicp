@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\api\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Customer\Order\CheckoutRequest;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Payment;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -14,40 +17,78 @@ class OrderController extends Controller
     {
         $shippingAddressId = $request->shipping_address_id;
 
-        $customerCard = Cart::with(['cartItems.product'])
-            ->where(['customer_id' => auth()->user()->user_id, 'status' => 'open'])
-            ->first();
-        
-        if(!$customerCard) return 'empty card';
+        try {
+            DB::beginTransaction();
+            $customerCard = Cart::with(['cartItems.product'])
+                ->where(['customer_id' => auth()->user()->user_id, 'status' => 'open'])
+                ->first();
 
-        $cardItems = $customerCard->cartItems;
+            if (!$customerCard) return 'empty card';
 
-        if(count($cardItems) == 0) return 'empty card';
+            $cardItems = $customerCard->cartItems;
 
-    
-        $order = Order::query()->create([
-            'customer_id' => $request->user()->user_id,
-            'status' => 'pending',
-            'shipping_address_id' => $shippingAddressId,
-            'amount' => $cardItems->sum('amount')
-        ]);
+            if (count($cardItems) == 0) return 'empty card';
+
+            $order = Order::query()->create([
+                'customer_id' => $request->user()->user_id,
+                'status' => 'pending',
+                'shipping_address_id' => $shippingAddressId,
+                'amount' => $cardItems->sum('total_price')
+            ]);
+
+            $orderItemsData = collect($cardItems)->select(['product_id', 'quantity', 'price'])->toArray();
+
+            /** @var Order $order */
+            $order->orderItems()->createMany($orderItemsData);
 
 
-        $orderItemsData = collect($cardItems)->only(['product_id', 'quantity', 'price']);
-        /** @var Order $order */
-        $order->orderItems()->createMany($orderItemsData);
+            // create stripe payment intent
+
+            $stripe = new \Stripe\StripeClient(config('stripe.secret_key'));
 
 
-        // create stripe payment intent
 
-        $stripe = new \Stripe\StripeClient('');
+            $lineItems = [];
+            foreach ($order->orderItems as $item) {
+                $productName = $item->product->name;
+                $quantity = $item->quantity;
+                $unitPrice = $item->price;
 
-        $paymentIntent = $stripe->paymentIntents->create([
-            'amount' => $order->amount,
-            'currency' => 'usd',
-            'automatic_payment_methods' => ['enabled' => true],
-        ]);
-        
+                $lineItems[] = [
+                    'price_data' => [
+                        'currency' => 'usd',
+                        'product_data' => [
+                            'name' => $productName,
+                        ],
+                        'unit_amount' => $unitPrice * 100,
+                    ],
+                    'quantity' => $quantity,
+                ];
+            }
+            
+            $checkout_session = $stripe->checkout->sessions->create([
+                'line_items' => $lineItems,
+                'mode' => 'payment',
+                'success_url' => route('stripe.success'),
+                'cancel_url' => route('stripe.cancel'),
+            ]);
+
+            Payment::create([
+                'order_id' => $order->id,
+                'session_id' => $checkout_session->id,
+                'status' => 'pending',
+                'currency' => 'usd',
+                'amount' => $order->amount,
+            ]);
+
+            DB::commit();
+            
+            return response()->json([
+                'checkout_session' => $checkout_session->url
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
-
 }

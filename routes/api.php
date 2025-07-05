@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\api\Customer\StripeController;
 use App\Http\Controllers\api\FileController;
 use Illuminate\Support\Facades\Route;
 Route::prefix('admin')->group(function () {
@@ -23,3 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('download-file', [FileController::class, 'downloadFile']);
 });
 
+
+Route::get('stripe/success', [StripeController::class, 'success'])->name('stripe.success');
+
+Route::get('stripe/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
