@@ -14,11 +14,9 @@ class Category extends Model
     protected static function booted()
     {
         static::creating(function($category){
-            $category->slug = Str::slug($category->name);
+            $category->slug = Str::slug($category->name .'-'. time());
         });
-        static::updating(function($category){
-            $category->slug = Str::slug($category->name);
-        });
+       
     }
     protected $fillable = ['name','merchant_id','description','products_count','parent_category_id'];
     public function merchant(){

@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
 
-        // Category::factory(4)->has(Category::factory(5)->has(Category::factory(5), 'subCategories'), 'subCategories')->create();
+         Category::factory(4)->has(Category::factory(5)->has(Category::factory(5), 'subCategories'), 'subCategories')->create();
 
 
         Product::factory(1000)->create();
