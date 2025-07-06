@@ -42,7 +42,7 @@ class CartItemController extends Controller
             Log::error($exception->getMessage());
             return ResponseFormatter::error("an error occurred");
         }
-
+        return ResponseFormatter::success("item added to cart successfully");
     }
 
     public function destroy(CartItem $cartItem)
