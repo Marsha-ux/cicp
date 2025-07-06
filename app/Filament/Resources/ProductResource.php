@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers;
+use App\Models\Category;
 use App\Models\Product;
 use Filament\Forms;
+use Filament\Forms\Components;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -23,7 +25,16 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Components\FileUpload::make('image')->imageEditor(),
+                Components\TextInput::make('name'),
+                Components\TextInput::make('description'),
+                Components\TextInput::make('price'),
+                Components\Select::make('category_id')
+                    ->options(Category::all()->pluck('name', 'id'))
+                    ->searchable(),
+                Components\Toggle::make('is_banner'),
+                Components\Toggle::make('is_popular'),
+                Components\Toggle::make('is_offer'),
             ]);
     }
 

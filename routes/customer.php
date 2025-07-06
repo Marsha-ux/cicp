@@ -3,6 +3,9 @@ use App\Http\Controllers\api\Customer\AuthController;
 use App\Http\Controllers\api\Customer\CartController;
 use App\Http\Controllers\api\Customer\CartItemController;
 use App\Http\Controllers\api\Customer\HomePageController;
+use App\Http\Controllers\api\Customer\OrderController;
+use App\Http\Controllers\api\Customer\ProductController;
+use App\Http\Controllers\api\Customer\ShippingAddressController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -12,7 +15,7 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
     });
 Route::middleware(['auth:sanctum', 'user-type:customer'])->group(function () {
 
-    // Route::get('product', [ProductController::class, 'get']);
+    Route::get('products', [ProductController::class, 'get']);
 
     // broswe products in home page
 
@@ -22,6 +25,8 @@ Route::middleware(['auth:sanctum', 'user-type:customer'])->group(function () {
 
 
     Route::post('checkout', [OrderController::class, 'checkout']);
+    Route::apiResource('shipping_address', ShippingAddressController::class);
+
 
     // search products
 
