@@ -22,7 +22,7 @@ class Cart extends Model
     {
         return $this->cartItems->sum('total_price');
     }
-    public function getTotalQuantityAttribute()
+    public function getTotalQuantityAttribute()                                      
     {
         return $this->cartItems->sum('quantity');
     }

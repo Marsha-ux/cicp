@@ -22,7 +22,7 @@ class StripeController extends Controller
             $payment = Payment::where('session_id', $session_id)->first();
             $payment->status = "payed";
             $payment->save();
-            $payment->order()->update(["status" => "completed"]);
+            
 
             DB::commit();
             return response()->json(['message' => 'Payment successful']);
