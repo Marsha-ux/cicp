@@ -8,6 +8,7 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
@@ -31,12 +32,19 @@ class OrderController extends Controller
 
             $order = Order::query()->create([
                 'customer_id' => $request->user()->user_id,
-                'status' => 'pending',
+                
                 'shipping_address_id' => $shippingAddressId,
                 'amount' => $cardItems->sum('total_price')
             ]);
 
-            $orderItemsData = collect($cardItems)->select(['product_id', 'quantity', 'price'])->toArray();
+            $productToMerchantMapping = Product::query()
+            ->whereIn('id', $cardItems->pluck('product_id')->toArray())
+            ->pluck('merchant_id', 'id');
+
+            $orderItemsData = collect($cardItems)->select(['product_id', 'quantity', 'price'])->map(function($cardItem)use($productToMerchantMapping){
+                $cardItem['merchant_id'] = $productToMerchantMapping[$cardItem['product_id']];
+                return $cardItem;
+            })->toArray();
 
             /** @var Order $order */
             $order->orderItems()->createMany($orderItemsData);
@@ -81,6 +89,8 @@ class OrderController extends Controller
                 'amount' => $order->amount,
             ]);
 
+            $customerCard->delete();
+            
             DB::commit();
             
             return response()->json([
