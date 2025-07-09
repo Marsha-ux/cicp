@@ -9,6 +9,7 @@ Route::prefix('auth')->controller(\App\Http\Controllers\api\Merchant\AuthControl
     Route::post('/register', 'register');
 });
 
+
 Route::middleware(['auth:sanctum', 'user-type:merchant'])->group(function () {
 
     Route::apiResource('products', ProductController::class);
