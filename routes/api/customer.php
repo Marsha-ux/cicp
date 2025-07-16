@@ -22,7 +22,7 @@ Route::middleware(['auth:sanctum', 'user-type:customer'])->group(function () {
     Route::get('home_page_data', HomePageController::class);
     Route::get('cart', [CartController::class, 'myCart']);
     Route::apiResource('cart_item', CartItemController::class);
-    
+
 
     Route::post('checkout', [OrderController::class, 'checkout']);
     Route::apiResource('shipping_address', ShippingAddressController::class);
