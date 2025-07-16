@@ -1,22 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-</head>
-<body>
-    <h1 class="font-bold text-2xl"> Order Items Table </h1>
-
-
-
+<x-app-layout>
     @foreach ($orderItems as $orderItem)
-        <div style="display: flex; border:1px solid black; justify-content:space-between; margin: 50px 100px; padding: 20px 40px; align-items:center">
-            <div style="display: flex; align-items:center; gap: 20px">
+        <div class="flex border border-white text-white justify-between mx-[50px] my-[100px] px-[20px] py-[40px] items-center">
+            <div class="flex items-center gap-[20px]">
                 <div>
                     <img src="{{$orderItem->product->mainImage?->url}}" width="100px"/>
                 </div>
@@ -26,11 +11,13 @@
                     <p>Qty: {{ $orderItem->quantity }}</p>
                 </div>
             </div>
-            <div class="px-4 py-2 bg-gray-400 text-white rounded-sm">{{ $orderItem->status }}</div>
-            <div>
-                <i class="bi bi-arrow-down-short" style="font-size: 2rem;"></i>
+            <div class="flex gap-2">
+                <div class="px-4 py-2 {{$orderItem->status == 'pending' ? 'bg-gray-400' : 'bg-green-400'}} text-white rounded-sm">{{ $orderItem->status }}</div>
+                <form action="{{route('merchant.order_items.complete', ['orderItem' => $orderItem->id])}}" method="post">
+                    @csrf
+                    <button type="submit" id="complete-{{$orderItem->id}}" class="bg-green-500 rounded-sm py-2 px-4"> Complete </button>
+                </form>
             </div>
         </div>
     @endforeach
-</body>
-</html>
+</x-app-layout>

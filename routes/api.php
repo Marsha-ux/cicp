@@ -3,6 +3,8 @@
 use App\Http\Controllers\api\Customer\StripeController;
 use App\Http\Controllers\api\FileController;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
+
 Route::prefix('admin')->group(function () {
     require __DIR__.'/api/admin.php';
 });

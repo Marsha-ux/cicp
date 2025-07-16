@@ -15,4 +15,13 @@ class OrderItemController
 
         return view('merchant.order_items', ['orderItems' => $orderItems]);
     }
+
+    public function completeOrderItem(OrderItem $orderItem){
+        
+        $orderItem->update([
+            'status' => 'completed'
+        ]);
+
+        return back(); 
+    }
 }
